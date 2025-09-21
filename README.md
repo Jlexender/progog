@@ -7,6 +7,13 @@ A simple tool that retrieves Bitcoin blockchain data from `blockchain.info` API 
 * Exporting is made with help of the `reflect` package
 * Depends only on the Go standard library; no external package dependencies
 
+## Usage
+
+```shell
+$ ./progog 
+Usage: progog -start <block_hash> -depth <depth> -retry <max_retries>
+```
+
 ## Parallelism note
 
 We retrieve next block hash from the HTTP request, hence, parallelism is very limited when sending HTTP requests and I did not find an adequate applicaiton of it here.
