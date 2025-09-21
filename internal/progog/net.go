@@ -8,7 +8,15 @@ import (
 	"time"
 )
 
-const maxRetries = 3
+var maxRetries int
+
+func SetMaxRetries(retries int) {
+	if retries < 1 {
+		maxRetries = 1
+	} else {
+		maxRetries = retries
+	}
+}
 
 func tryGetBlock(hash string) (*Block, error) {
 	var lastErr error
