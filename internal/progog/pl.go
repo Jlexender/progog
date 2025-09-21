@@ -12,7 +12,7 @@ func exportBlockPoolToProlog() string {
 	var output []string
 
 	output = append(output, "% Bitcoin Blockchain Knowledge Base")
-	output = append(output, "% Auto-generated using progog")
+	output = append(output, "% Facts auto-generated using progog")
 	output = append(output, "")
 
 	var facts []string
