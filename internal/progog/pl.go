@@ -32,7 +32,7 @@ func exportBlockPoolToProlog() string {
 		}
 
 		if blockHash == "" {
-			continue 
+			continue
 		}
 
 		var facts []string
