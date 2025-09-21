@@ -5,32 +5,59 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 )
 
-func getBlock(hash string) (*Block, error) {
+const maxRetries = 3
+
+func tryGetBlock(hash string) (*Block, error) {
+	var lastErr error
+	
 	url := "https://blockchain.info/rawblock/" + hash
 
-	resp, err := http.Get(url)
-	if err != nil {
-		return nil, fmt.Errorf("HTTP request error: %v", err)
+	for retry := 0; retry < maxRetries; retry++ {
+		resp, err := http.Get(url)
+		if err != nil {
+			lastErr = fmt.Errorf("HTTP request error on attempt %d: %v", retry+1, err)
+			if retry < maxRetries-1 {
+				time.Sleep(time.Duration(retry+1) * time.Second)
+				continue
+			}
+			return nil, lastErr
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK {
+			lastErr = fmt.Errorf("HTTP status %d on attempt %d", resp.StatusCode, retry+1)
+			if retry < maxRetries-1 {
+				time.Sleep(time.Duration(retry+1) * time.Second)
+				continue
+			}
+			return nil, lastErr
+		}
+
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			lastErr = fmt.Errorf("HTTP response read error on attempt %d: %v", retry+1, err)
+			if retry < maxRetries-1 {
+				time.Sleep(time.Duration(retry+1) * time.Second)
+				continue
+			}
+			return nil, lastErr
+		}
+
+		var block Block
+		if err := json.Unmarshal(body, &block); err != nil {
+			lastErr = fmt.Errorf("JSON parsing error on attempt %d: %v", retry+1, err)
+			if retry < maxRetries-1 {
+				time.Sleep(time.Duration(retry+1) * time.Second)
+				continue
+			}
+			return nil, lastErr
+		}
+
+		return &block, nil
 	}
-	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("HTTP status: %d", resp.StatusCode)
-	}
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("HTTP response read error: %v", err)
-	}
-
-	var block Block
-	if err := json.Unmarshal(body, &block); err != nil {
-		return nil, fmt.Errorf("JSON parsing error: %v", err)
-	}
-
-	
-
-	return &block, nil
+	return nil, fmt.Errorf("failed to fetch block %s after %d attempts: %v", hash, maxRetries, lastErr)
 }
