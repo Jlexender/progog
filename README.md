@@ -9,4 +9,4 @@ A simple tool that retrieves Bitcoin blockchain data from `blockchain.info` API 
 
 ## Parallelism note
 
-We retrieve next block hash from the HTTP request, hence, parallelism is very limited when sending HTTP requests and I did not find an adequate applicaiton of itg here.
+We retrieve next block hash from the HTTP request, hence, parallelism is very limited when sending HTTP requests and I did not find an adequate applicaiton of it here.
