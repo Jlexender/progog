@@ -15,17 +15,61 @@ func exportBlockPoolToProlog() string {
 	output = append(output, "")
 
 	for _, block := range BlockPool {
-		val := reflect.ValueOf(block)
-		typ := reflect.TypeOf(block)
+		if block == nil {
+			continue
+		}
+
+		val := reflect.ValueOf(*block)
+		typ := reflect.TypeOf(*block)
+
+		var blockHash string
+		for i := 0; i < val.NumField(); i++ {
+			fieldName := typ.Field(i).Name
+			if strings.ToLower(fieldName) == "hash" {
+				blockHash = fmt.Sprintf("'%v'", val.Field(i).Interface())
+				break
+			}
+		}
+
+		if blockHash == "" {
+			continue 
+		}
 
 		var facts []string
 		for i := 0; i < val.NumField(); i++ {
 			fieldName := typ.Field(i).Name
 			fieldValue := val.Field(i).Interface()
-			// Convert field name to lowercase for Prolog style
-			prologFact := fmt.Sprintf("%s(%v, %v).", strings.ToLower(typ.Name()), strings.ToLower(fieldName), fieldValue)
+
+			prologFieldName := strings.ToLower(fieldName)
+
+			var formattedValue string
+			switch v := fieldValue.(type) {
+			case string:
+				if prologFieldName == "hash" {
+					facts = append(facts, fmt.Sprintf("block_hash(%s).", blockHash))
+					continue
+				} else {
+					formattedValue = fmt.Sprintf("'%s'", v)
+				}
+			case []string:
+				if len(v) == 0 {
+					formattedValue = "[]"
+				} else {
+					var quotedItems []string
+					for _, item := range v {
+						quotedItems = append(quotedItems, fmt.Sprintf("'%s'", item))
+					}
+					formattedValue = fmt.Sprintf("[%s]", strings.Join(quotedItems, ", "))
+				}
+			default:
+				formattedValue = fmt.Sprintf("%v", v)
+			}
+
+			// Create facts in the format: field_name(BlockHash, Value)
+			prologFact := fmt.Sprintf("block_%s(%s, %s).", prologFieldName, blockHash, formattedValue)
 			facts = append(facts, prologFact)
 		}
+
 		output = append(output, strings.Join(facts, "\n"))
 		output = append(output, "")
 	}
