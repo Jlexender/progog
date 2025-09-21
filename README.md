@@ -4,4 +4,3 @@ A simple tool that retrieves Bitcoin blockchain data from `blockchain.info` API 
 
 * Exporting is made with help of the `reflect` package
 * No Go package dependencies
-
