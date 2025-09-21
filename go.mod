@@ -1,3 +1,3 @@
-module jex/bc-progog
+module jex/progog
 
 go 1.25.1
