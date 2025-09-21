@@ -11,17 +11,16 @@ func main() {
 	startHash := flag.String("start", "", "Starting block hash")
 	depth := flag.Int("depth", 1, "Depth of traversal")
 	flag.Parse()
-	
+
 	if *startHash == "" || *depth < 1 {
 		throwExit()
 	}
-	
-	progog.Start(*startHash, *depth)
-}
 
+	progog.Start(*startHash, *depth)
+	progog.ExportToKB("out.pl")
+}
 
 func throwExit() {
 	fmt.Println("Usage: progog -start <block_hash> -depth <depth>")
 	os.Exit(1)
 }
-

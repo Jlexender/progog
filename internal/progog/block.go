@@ -8,4 +8,4 @@ type Block struct {
 	Nonce      uint32   `json:"nonce"`
 }
 
-var blockPool []*Block
+var BlockPool []*Block

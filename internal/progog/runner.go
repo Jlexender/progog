@@ -5,7 +5,7 @@ import (
 )
 
 func Start(startHash string, depth int) {
-	blockPool = make([]*Block, 0, depth)
+	BlockPool = make([]*Block, 0, depth)
 	traverseInOrder(startHash, depth)
 }
 
@@ -20,7 +20,7 @@ func traverseInOrder(hash string, depth int) {
 		return
 	}
 
-	blockPool = append(blockPool, block)
+	BlockPool = append(BlockPool, block)
 
 	for _, nextHash := range block.NextBlock {
 		traverseInOrder(nextHash, depth-1)

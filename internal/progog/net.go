@@ -12,7 +12,7 @@ const maxRetries = 3
 
 func tryGetBlock(hash string) (*Block, error) {
 	var lastErr error
-	
+
 	url := "https://blockchain.info/rawblock/" + hash
 
 	for retry := 0; retry < maxRetries; retry++ {
