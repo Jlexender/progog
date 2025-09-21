@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"slices"
 	"strings"
 )
 
@@ -14,6 +15,7 @@ func exportBlockPoolToProlog() string {
 	output = append(output, "% Auto-generated using progog")
 	output = append(output, "")
 
+	var facts []string
 	for _, block := range BlockPool {
 		if block == nil {
 			continue
@@ -35,7 +37,7 @@ func exportBlockPoolToProlog() string {
 			continue
 		}
 
-		var facts []string
+		
 		for i := 0; i < val.NumField(); i++ {
 			fieldName := typ.Field(i).Name
 			fieldValue := val.Field(i).Interface()
@@ -69,10 +71,11 @@ func exportBlockPoolToProlog() string {
 			prologFact := fmt.Sprintf("block_%s(%s, %s).", prologFieldName, blockHash, formattedValue)
 			facts = append(facts, prologFact)
 		}
-
-		output = append(output, strings.Join(facts, "\n"))
-		output = append(output, "")
 	}
+
+	slices.Sort(facts)
+	output = append(output, facts...)
+	output = append(output, "")
 
 	return strings.Join(output, "\n")
 }
