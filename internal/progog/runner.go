@@ -14,7 +14,7 @@ func traverseInOrder(hash string, depth int) {
 		return
 	}
 
-	block, err := getBlock(hash)
+	block, err := tryGetBlock(hash)
 	if err != nil {
 		fmt.Printf("Error fetching block %s: %v\n", hash, err)
 		return
@@ -25,8 +25,4 @@ func traverseInOrder(hash string, depth int) {
 	for _, nextHash := range block.NextBlock {
 		traverseInOrder(nextHash, depth-1)
 	}
-
-	fmt.Println(block.Hash)
 }
-
-
